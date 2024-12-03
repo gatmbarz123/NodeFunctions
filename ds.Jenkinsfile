@@ -6,7 +6,7 @@ pipeline {
         stage('Get agent info') {
             steps {
                 script {
-                    def agentHost = getAgentInfo()
+                    def agentHost = getNodeName()
                     echo "Agent hostname: ${agentHost}"
                 }
             }
