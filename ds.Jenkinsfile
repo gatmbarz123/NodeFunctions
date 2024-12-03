@@ -1,12 +1,14 @@
-@Library('shared') _
+@Library('shared-libs') _
 
 pipeline {
     agent any
+    
     stages {
         stage('Print Node') {
             steps {
                 script {
-                    echo "Running on node: ${getNodeName()}"
+                    def nodeName = getNodeName()
+                    echo "Running on node: ${nodeName}"
                 }
             }
         }
