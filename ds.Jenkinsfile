@@ -6,8 +6,7 @@ pipeline {
         stage('Print Node') {
             steps {
                 script {
-                    def nodeName = getNodeName()
-                    echo "Running on node: ${nodeName}"
+                    echo "Running on node: ${getNodeName()}"
                 }
             }
         }
