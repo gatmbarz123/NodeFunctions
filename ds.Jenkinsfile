@@ -1,3 +1,5 @@
+@Library('agent') _ 
+ 
 pipeline {
     agent { label 'agent' }
     stages {
