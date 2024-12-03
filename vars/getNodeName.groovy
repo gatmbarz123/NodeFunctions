@@ -1,4 +1,4 @@
 def call() {
-   def hostname = sh(script: 'hostname', returnStdout: true).trim()
+   def hostname = sh(script: 'hostname', returnStdout: true)
    return hostname
 }
