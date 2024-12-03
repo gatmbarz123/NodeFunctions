@@ -1,14 +1,11 @@
-@Library('shared') _
-
 pipeline {
-    agent any
-    
+    agent { label 'agent' }
     stages {
-        stage('Print Node') {
+        stage('Get agent info') {
             steps {
                 script {
-                    def nodeName = getNodeName()
-                    echo "Running on node: ${nodeName}"
+                    def agentHost = getAgentInfo()
+                    echo "Agent hostname: ${agentHost}"
                 }
             }
         }

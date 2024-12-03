@@ -1,3 +1,4 @@
 def call() {
-    return env.NODE_NAME
+   def hostname = sh(script: 'hostname', returnStdout: true).trim()
+   return hostname
 }
