@@ -1,4 +1,4 @@
-@Library('hostname_agent') _ 
+@Library('agent') _ 
  
 pipeline {
     agent { label 'agent' }
