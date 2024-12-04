@@ -1,7 +1,7 @@
 @Library('agent') _ 
  
 pipeline {
-    agent { label 'agent' }
+    agent any
     stages {
         stage('Get agent info') {
             steps {
