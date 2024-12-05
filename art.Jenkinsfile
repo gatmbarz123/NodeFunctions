@@ -1,41 +1,29 @@
 pipeline {
     agent {
-        label 'agent-0'  // This matches your JENKINS_AGENT_NAME
+        label 'agent-0'
     }
     
     environment {
         CI = true
         ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
+        VERSION = "1.0.${BUILD_NUMBER}"
     }
     
     stages {
-        stage('Prepare Agent') {
+        stage('Build JAR') {
             steps {
-                // Install JFrog CLI if not present
-                sh '''
-                    if ! command -v jfrog &> /dev/null; then
-                        curl -fL https://install-cli.jfrog.io | sh
-                        mv jfrog /usr/local/bin/
-                    fi
-                '''
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                // Clean and build
-                sh 'mvn clean install'
+                // Maven build to create JAR
+                sh 'mvn clean package -DskipTests'
             }
         }
         
         stage('Upload to Artifactory') {
             steps {
+                // Using curl to upload to Artifactory
                 sh """
-                    jfrog rt upload \
-                        --url http://16.16.24.80:8082//artifactory/ \
-                        --access-token ${ARTIFACTORY_ACCESS_TOKEN} \
-                        "target/*.jar" \
-                        my-repo/
+                    curl -H "X-JFrog-Art-Api:${ARTIFACTORY_ACCESS_TOKEN}" \
+                        -T target/*.jar \
+                        "http://16.16.24.80:8082//artifactory/libs-release-local/com/example/myapp/${VERSION}/"
                 """
             }
         }
