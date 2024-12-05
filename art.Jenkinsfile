@@ -47,9 +47,6 @@ pipeline {
                         ]
                     }"""
                     
-                    def buildInfo = server.upload spec: uploadSpec
-                    buildInfo.env.collect()
-                    server.publishBuildInfo buildInfo
                 }
             }
         }
