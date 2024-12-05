@@ -35,7 +35,7 @@ pipeline {
                     def uploadSpec = """{
                         "files": [
                             {
-                                "pattern": "artifact-${ARTIFACT_VERSION}.zip",
+                                "pattern": "test-file.txt",
                                 "target": "${env.REPO_NAME}/releases/${MAJOR_VERSION}.${MINOR_VERSION}/${ARTIFACT_VERSION}/",
                                 "props": "version=${ARTIFACT_VERSION};status=release"
                             },
