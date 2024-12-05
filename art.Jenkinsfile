@@ -15,26 +15,32 @@ pipeline {
         stage('Setup Maven') {
             steps {
                 sh '''
-                    # Create directory for Maven
-                    mkdir -p /opt/maven
+                    # Create directory for Maven in user's home
+                    mkdir -p ${HOME}/maven
                     
                     # Download and extract Maven
-                    cd /opt/maven
+                    cd ${HOME}/maven
                     curl -O https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
                     tar xzf apache-maven-3.9.6-bin.tar.gz
                     mv apache-maven-3.9.6/* .
                     rm apache-maven-3.9.6-bin.tar.gz
+                    rm -rf apache-maven-3.9.6
                     
-                    # Verify Maven installation
-                    mvn --version
+                    # Add execute permissions
+                    chmod +x ${HOME}/maven/bin/mvn
+                    
+                    # Print Maven version to verify installation
+                    ${HOME}/maven/bin/mvn --version
                 '''
             }
         }
         
         stage('Build JAR') {
             steps {
-                // Maven build to create JAR
-                sh 'mvn clean package -DskipTests'
+                sh '''
+                    # Use Maven from our installation
+                    ${HOME}/maven/bin/mvn clean package -DskipTests
+                '''
             }
         }
         
