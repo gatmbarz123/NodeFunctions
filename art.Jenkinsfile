@@ -22,9 +22,6 @@ pipeline {
                         echo "version=${ARTIFACT_VERSION}" > version.properties
                         echo "This is version ${ARTIFACT_VERSION}" > test-file.txt
                         echo "Created at: \$(date)" >> test-file.txt
-                        
-                        # Create a zip file with version information
-                        zip -r artifact-${ARTIFACT_VERSION}.zip test-file.txt version.properties
                     """
                 }
             }
