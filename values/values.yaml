@@ -25,4 +25,4 @@ controller:
                     label: "sonar-agent"
                     containers:
                       - name: "jnlp"
-                        image: "your-registry/jenkins-sonar-agent:latest"
+                        image: "diskoproject/jenkins-sonar-agent:latest"

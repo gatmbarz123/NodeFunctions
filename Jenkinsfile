@@ -7,12 +7,14 @@ pipeline {
         SONAR_URL = 'http://13.60.226.63:9000'
         ARTIFACTORY_URL = 'http://13.60.226.63:8082'
         ARTIFACTORY_CREDS = credentials('artifactory-credentials')
+        SONAR_TOKEN = credentials('sonarqube-token')
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/your-project.git'
+                // Replace with your actual repository URL
+                git branch: 'main', url: 'https://github.com/gatmbarz123/NodeFunctions.git'
             }
         }
         
@@ -27,10 +29,11 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         sonar-scanner \
-                            -Dsonar.projectKey=your-project \
+                            -Dsonar.projectKey=test-project \
                             -Dsonar.sources=src/main/java \
                             -Dsonar.java.binaries=target/classes \
-                            -Dsonar.host.url=${SONAR_URL}
+                            -Dsonar.host.url=${SONAR_URL} \
+                            -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
                 
