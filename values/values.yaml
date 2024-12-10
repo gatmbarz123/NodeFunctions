@@ -1,0 +1,28 @@
+# values.yaml
+controller:
+  ingress:
+    enabled: true
+    hosts:
+      - jenkins.your-domain.com
+  
+  additionalPlugins:
+    - sonar:latest
+    - artifactory:latest
+    - pipeline-utility-steps:latest
+    
+  JCasC:
+    configScripts:
+      cloud: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: "kubernetes"
+                serverUrl: "https://kubernetes.default"
+                jenkinsUrl: "http://jenkins-controller:8080"
+                jenkinsTunnel: "jenkins-controller:50000"
+                templates:
+                  - name: "sonar-agent"
+                    label: "sonar-agent"
+                    containers:
+                      - name: "jnlp"
+                        image: "your-registry/jenkins-sonar-agent:latest"

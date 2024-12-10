@@ -1,73 +1,56 @@
 pipeline {
     agent {
-        dockerfile {
-            filename 'Dockerfile'
-            args '-v $HOME/.m2:/home/jenkins/.m2'
-        }
+        label 'sonar-agent'
     }
     
     environment {
-        ARTIFACTORY_URL = 'http://artifactory.example.com/artifactory'
-        ARTIFACTORY_REPO = 'python-local'
+        SONAR_URL = 'http://13.60.226.63:9000'
+        ARTIFACTORY_URL = 'http://13.60.226.63:8082'
         ARTIFACTORY_CREDS = credentials('artifactory-credentials')
-        SONAR_URL = 'http://sonarqube.example.com'
-        SONAR_TOKEN = credentials('sonarqube-token')
     }
     
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/your-repo/your-project.git'
             }
         }
         
-        stage('Install Dependencies') {
+        stage('Build') {
             steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
-        
-        stage('Run Tests') {
-            steps {
-                sh 'python3 -m pytest test_app.py --cov=. --cov-report=xml'
+                sh 'mvn clean package'
             }
         }
         
         stage('SonarQube Analysis') {
             steps {
-                sh """
-                    sonar-scanner \
-                    -Dsonar.projectKey=python-sample \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=${SONAR_URL} \
-                    -Dsonar.login=${SONAR_TOKEN} \
-                    -Dsonar.python.coverage.reportPaths=coverage.xml \
-                    -Dsonar.exclusions=test_*.py
-                """
-            }
-        }
-        
-        stage('Package Application') {
-            steps {
-                sh 'zip -r app.zip app.py requirements.txt'
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=your-project \
+                            -Dsonar.sources=src/main/java \
+                            -Dsonar.java.binaries=target/classes \
+                            -Dsonar.host.url=${SONAR_URL}
+                    """
+                }
+                
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
         
         stage('Upload to Artifactory') {
             steps {
                 script {
+                    def server = Artifactory.server 'artifactory'
                     def uploadSpec = """{
                         "files": [{
-                            "pattern": "app.zip",
-                            "target": "${ARTIFACTORY_REPO}/python-app/${BUILD_NUMBER}/app.zip"
+                            "pattern": "target/*.jar",
+                            "target": "java-local-repo/"
                         }]
                     }"""
-                    
-                    def server = Artifactory.newServer url: env.ARTIFACTORY_URL, 
-                                                    credentialsId: 'artifactory-credentials'
-                    
-                    def buildInfo = server.upload spec: uploadSpec
-                    server.publishBuildInfo buildInfo
+                    server.upload(uploadSpec)
                 }
             }
         }
@@ -75,25 +58,16 @@ pipeline {
         stage('Download from Artifactory') {
             steps {
                 script {
+                    def server = Artifactory.server 'artifactory'
                     def downloadSpec = """{
                         "files": [{
-                            "pattern": "${ARTIFACTORY_REPO}/python-app/${BUILD_NUMBER}/app.zip",
-                            "target": "downloaded_app.zip"
+                            "pattern": "java-local-repo/*.jar",
+                            "target": "downloaded/"
                         }]
                     }"""
-                    
-                    def server = Artifactory.newServer url: env.ARTIFACTORY_URL, 
-                                                    credentialsId: 'artifactory-credentials'
-                    
-                    server.download spec: downloadSpec
+                    server.download(downloadSpec)
                 }
             }
-        }
-    }
-    
-    post {
-        always {
-            cleanWs()
         }
     }
 }

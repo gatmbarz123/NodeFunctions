@@ -2,22 +2,15 @@ FROM jenkins/inbound-agent:latest
 
 USER root
 
-# Install Python and required tools
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    wget \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install SonarQube Scanner
-RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
-    && unzip sonar-scanner-cli-4.8.0.2856-linux.zip \
+RUN curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip \
+    && unzip sonar-scanner.zip \
     && mv sonar-scanner-4.8.0.2856-linux /opt/sonar-scanner \
-    && rm sonar-scanner-cli-4.8.0.2856-linux.zip
+    && rm sonar-scanner.zip
 
-# Add SonarQube Scanner to PATH
-ENV PATH="/opt/sonar-scanner/bin:${PATH}"
+ENV PATH $PATH:/opt/sonar-scanner/bin
 
-# Switch back to jenkins user
+# Install Java and Maven
+RUN apt-get update && apt-get install -y maven
+
 USER jenkins
