@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'sonar-agent'
+        agent any
     }
     
     environment {
