@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>demo-app</artifactId>
+    <artifactId>node-functions</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -13,6 +13,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.host.url>http://51.20.74.124:9000</sonar.host.url>
+        <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
     </properties>
 
     <dependencies>
@@ -24,11 +25,31 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.1.2184</version>
+            </plugin>
+        </plugins>
+    </build>
+
     <distributionManagement>
         <repository>
             <id>artifactory</id>
             <name>Artifactory Repository</name>
             <url>http://51.20.74.124:8081/artifactory/libs-release-local</url>
         </repository>
+        <snapshotRepository>
+            <id>artifactory</id>
+            <name>Artifactory Repository</name>
+            <url>http://51.20.74.124:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
