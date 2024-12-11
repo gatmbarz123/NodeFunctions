@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-agent
+  labels:
+    app: jenkins-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-agent
+  template:
+    metadata:
+      labels:
+        app: jenkins-agent
+    spec:
+      containers:
+      - name: jenkins-agent
+        image: diskoproject/jenkins-sonar-agent
+        env:
+        - name: JENKINS_URL
+          value: "http://jenkins.default.svc.cluster.local:8080"
+        - name: JENKINS_SECRET
+          value: "97192fe71030e425cfeabf9061b9f01f23dcc2afb8899ba71a3e52546312b66e" 
+        - name: JENKINS_AGENT_NAME
+          value: "k8s-agent"
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        volumeMounts:
+        - name: workspace-volume
+          mountPath: /home/jenkins/agent
+      volumes:
+      - name: workspace-volume
+        emptyDir: {}

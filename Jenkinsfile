@@ -1,11 +1,14 @@
 pipeline {
     agent {
-        agent any
+        label 'k8s-agent'
+    }
+    
+    tools {
+        maven 'Maven'
+        jdk 'JDK11'
     }
     
     environment {
-        SONAR_URL = 'http://13.60.226.63:9000'
-        ARTIFACTORY_URL = 'http://13.60.226.63:8081/artifactory'
         ARTIFACTORY_CREDS = credentials('artifactory-credentials')
         SONAR_TOKEN = credentials('sonarqube-token')
     }
@@ -17,95 +20,59 @@ pipeline {
             }
         }
         
-        stage('Install Dependencies') {
+        stage('Build and Test') {
             steps {
-                sh '''
-                    if ! command -v npm &> /dev/null; then
-                        curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-                        apt-get install -y nodejs
-                    fi
-                    npm install
-                '''
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                sh 'npm run build || echo "No build script found"'
+                sh 'mvn clean test'
             }
         }
         
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                        sonar-scanner \
-                            -Dsonar.projectKey=test-project \
-                            -Dsonar.sources=. \
-                            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/** \
-                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.host.url=${SONAR_URL} \
-                            -Dsonar.login=${SONAR_TOKEN}
-                    """
+                    sh 'mvn sonar:sonar'
                 }
-                
-                timeout(time: 2, unit: 'MINUTES') {
+            }
+        }
+        
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
                     waitForQualityGate abortPipeline: true
                 }
             }
         }
         
-        stage('Package') {
+        stage('Deploy to Artifactory') {
             steps {
-                sh '''
-                    tar -czf nodeFunctions.tar.gz \
-                        --exclude='node_modules' \
-                        --exclude='.git' \
-                        --exclude='coverage' \
-                        .
-                '''
-            }
-        }
-        
-        stage('Upload to Artifactory') {
-            steps {
-                script {
-                    def server = Artifactory.newServer url: ARTIFACTORY_URL, credentialsId: 'artifactory-credentials'
-                    def uploadSpec = """{
-                        "files": [{
-                            "pattern": "nodeFunctions.tar.gz",
-                            "target": "nodejs-local-repo/NodeFunctions/${BUILD_NUMBER}/",
-                            "props": {
-                                "build.number": "${BUILD_NUMBER}",
-                                "build.name": "${JOB_NAME}"
-                            }
-                        }]
-                    }"""
-                    server.upload spec: uploadSpec
-                }
+                rtMavenDeployer(
+                    id: 'deployer',
+                    serverId: 'artifactory-server',
+                    releaseRepo: 'libs-release-local',
+                    snapshotRepo: 'libs-snapshot-local'
+                )
+                rtMavenRun(
+                    tool: 'Maven',
+                    pom: 'pom.xml',
+                    goals: 'clean install',
+                    deployerId: 'deployer'
+                )
             }
         }
         
         stage('Download from Artifactory') {
             steps {
-                script {
-                    def server = Artifactory.newServer url: ARTIFACTORY_URL, credentialsId: 'artifactory-credentials'
-                    def downloadSpec = """{
-                        "files": [{
-                            "pattern": "nodejs-local-repo/NodeFunctions/${BUILD_NUMBER}/*.tar.gz",
-                            "target": "downloaded/",
-                            "flat": true
-                        }]
-                    }"""
-                    server.download spec: downloadSpec
-                }
+                rtDownload(
+                    serverId: 'artifactory-server',
+                    spec: '''{
+                        "files": [
+                            {
+                                "pattern": "libs-release-local/com/example/demo-app/1.0-SNAPSHOT/demo-app-1.0-SNAPSHOT.jar",
+                                "target": "downloaded-artifacts/"
+                            }
+                        ]
+                    }'''
+                )
             }
-        }
-    }
-    
-    post {
-        always {
-            cleanWs()
         }
     }
 }

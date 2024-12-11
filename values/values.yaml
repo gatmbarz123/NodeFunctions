@@ -1,48 +1,37 @@
 controller:
-  # Enable the Kubernetes plugin for Jenkins to create agents dynamically
-  kubernetes:
-    cloud:
-      name: "kubernetes"
-      serverUrl: "https://kubernetes.default.svc"
-      jenkinsUrl: "http://jenkins:8080"
-      jenkinsTunnel: "jenkins:50000"
-      namespace: "default"
-      directConnection: false
-      templates:
-        - name: "sonar-agent"
-          label: "sonar-agent"
-          nodeUsageMode: EXCLUSIVE
-          containers:
-            - name: "jnlp"
-              image: "diskoproject/jenkins-sonar-agent:latest" # Make sure this image includes the SonarQube scanner
-              alwaysPullImage: true
-          volumes:
-            - type: HostPath
-              hostPath: "/var/run/docker.sock"
-              mountPath: "/var/run/docker.sock"
-
-    # Enable the configuration-as-code plugin and specify your config scripts
-    JCasC:
-      configScripts:
-        cloud: |
-          jenkins:
-            clouds:
-              - kubernetes:
-                  name: "kubernetes"
-                  serverUrl: "https://kubernetes.default.svc"
-                  namespace: "default"
-                  directConnection: false
-                  jenkinsUrl: "http://jenkins:8080"
-                  jenkinsTunnel: "jenkins:50000"
-                  templates:
-                    - name: "sonar-agent"
-                      label: "sonar-agent"
-                      nodeUsageMode: EXCLUSIVE
-                      containers:
-                        - name: "jnlp"
-                          image: "diskoproject/jenkins-sonar-agent:latest"
-                          alwaysPullImage: true
-                      volumes:
-                        - type: HostPath
-                          hostPath: "/var/run/docker.sock"
-                          mountPath: "/var/run/docker.sock"
+  ingress:
+    enabled: true
+    hosts:
+      - jenkins.your-domain.com
+    ingressClassName: nginx
+    annotations:
+      kubernetes.io/tls-acme: "true"
+  
+  additionalPlugins:
+    - sonar:latest
+    - artifactory:latest
+    - pipeline-utility-steps:latest
+  
+  # Enable JNLP port
+  jenkinsAdminEmail: "admin@example.com"
+  
+  # Service configuration to expose JNLP port
+  serviceType: ClusterIP
+  servicePort: 8080
+  targetPort: 8080
+  # JNLP port configuration
+  agentListenerPort: 50000
+  
+  # Resources for the controller
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2000m"
+      memory: "2Gi"
+  
+  # Persistence configuration
+  persistence:
+    enabled: true
+    size: "10Gi"
