@@ -44,12 +44,12 @@
         <repository>
             <id>artifactory</id>
             <name>Artifactory Repository</name>
-            <url>http://51.20.74.124:8081/artifactory/libs-release-local</url>
+            <url>http://51.20.74.124:8081/artifactory/java-local-repo</url>
         </repository>
         <snapshotRepository>
             <id>artifactory</id>
             <name>Artifactory Repository</name>
-            <url>http://51.20.74.124:8081/artifactory/libs-snapshot-local</url>
+            <url>http://51.20.74.124:8081/artifactory/java-snapshot-repo</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

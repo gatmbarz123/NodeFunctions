@@ -29,7 +29,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=node-functions \
+                        -Dsonar.host.url=http://51.20.74.124:9000
+                    '''
                 }
             }
         }
@@ -47,8 +51,8 @@ pipeline {
                 rtMavenDeployer(
                     id: 'deployer',
                     serverId: 'artifactory-server',
-                    releaseRepo: 'libs-release-local',
-                    snapshotRepo: 'libs-snapshot-local'
+                    releaseRepo: 'java-local-repo',
+                    snapshotRepo: 'java-snapshot-repo'
                 )
                 rtMavenRun(
                     tool: 'Maven',
@@ -66,12 +70,13 @@ pipeline {
                     spec: '''{
                         "files": [
                             {
-                                "pattern": "libs-release-local/com/example/demo-app/1.0-SNAPSHOT/demo-app-1.0-SNAPSHOT.jar",
+                                "pattern": "java-local-repo/com/example/node-functions/1.0-SNAPSHOT/*.jar",
                                 "target": "downloaded-artifacts/"
                             }
                         ]
                     }'''
                 )
+                sh 'ls -l downloaded-artifacts'
             }
         }
     }
