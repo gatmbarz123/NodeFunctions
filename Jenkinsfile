@@ -70,7 +70,7 @@ pipeline {
                     spec: '''{
                         "files": [
                             {
-                                "pattern": "java-local-repo/com/example/node-functions/1.0-SNAPSHOT/*.jar",
+                                "pattern": "java-snapshot-repo/com/example/node-functions/1.0-SNAPSHOT/*.jar",
                                 "target": "downloaded-artifacts/"
                             }
                         ]
