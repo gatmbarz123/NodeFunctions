@@ -26,21 +26,26 @@ pipeline {
             }
         }
         
-        
         stage('SonarQube Analysis') {
+            agent {
+                kubernetes {
+                    label 'sonarqube-pod'  
+                }
+            }
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                        sonar-scanner \
-                        -Dsonar.projectKey=node-functions \
-                        -Dsonar.sources=src/main/java/ \
-                        -Dsonar.java.binaries=target/classes \
-                        -Dsonar.host.url=http://51.20.74.124:9000
-                    """
+                container('sonarqube') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                            sonar-scanner \
+                            -Dsonar.projectKey=node-functions \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://51.20.74.124:9000
+                        '''
+                    }
                 }
             }
         }
-        
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
