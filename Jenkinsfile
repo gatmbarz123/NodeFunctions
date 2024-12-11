@@ -26,14 +26,17 @@ pipeline {
             }
         }
         
+        
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        mvn sonar:sonar \
+                    sh """
+                        sonar-scanner \
                         -Dsonar.projectKey=node-functions \
+                        -Dsonar.sources=src/main/java/ \
+                        -Dsonar.java.binaries=target/classes \
                         -Dsonar.host.url=http://51.20.74.124:9000
-                    '''
+                    """
                 }
             }
         }
