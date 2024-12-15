@@ -15,7 +15,7 @@ pipeline {
                     def jsonFile = readJSON file: Readfile
 
                     jsonFile.each{ key,value ->
-                        echo $"{key}" -> $"{value}"
+                        echo $"{key}" ':' $"{value}"
 
                     }
                 }
