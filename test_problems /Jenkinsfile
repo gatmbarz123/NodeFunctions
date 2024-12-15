@@ -9,13 +9,13 @@ pipeline{
         }
     }
 
-    stages{
+    
         stage("Read File"){
             steps{
                 buildConfig =  readYaml file: 'build-config.yaml'
             }
         }
-    }
+    
 
 
         stage('Build for test '){
@@ -29,5 +29,5 @@ pipeline{
                 }
             }
         }
-    }
+}
 
