@@ -11,8 +11,7 @@ pipeline {
         stage("Read and Print"){
             steps{
                 script{
-                    def Readfile = readFile file: "data.json"
-                    def jsonFile = readJSON file: Readfile
+                    def jsonData = readJSON file: jsonFile
 
                     jsonFile.each{ key,value ->
                         echo $"{key}" ':' $"{value}"
