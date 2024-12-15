@@ -6,7 +6,7 @@ pipeline{
     stages{
         stage("Checkout"){
             steps{
-                git_branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
+                git branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
             }
         }
 
