@@ -8,20 +8,15 @@ pipeline {
             }
         }
 
-        stage("Read File") {
-            steps {
-                script {
-                    buildConfig = readYaml file: 'build-config.yaml'
-                }
-            }
-        }
+        stage("Read and Print"){
+            step{
+                script{
+                    def Readfile = readFile file: "data.json"
+                    def jsonFile = readJSON file: Readfile
 
-        stage('Build for Test') {
-            steps {
-                script {
-                    buildConfig.steps.each { step ->
-                        echo "Running step: ${step.name}"
-                        sh step.command
+                    jsonFile.each{ key,value ->
+                        echo $"{key}" -> $"{value}"
+
                     }
                 }
             }
