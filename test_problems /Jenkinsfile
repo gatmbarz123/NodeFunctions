@@ -4,6 +4,13 @@ pipeline{
     agent any
 
     stages{
+        stage("Checkout"){
+            steps{
+                git_branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
+            }
+        }
+
+
         stage('Build for test '){
             steps{
                 script{
