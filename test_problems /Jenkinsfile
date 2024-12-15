@@ -14,11 +14,11 @@ pipeline{
         stage('Build for test '){
             steps{
                 script{
-                    buildConfig.steps.each [steps ->
+                    buildConfig.steps.each {steps ->
                         stage(step.name){
                             sh step.command 
                         }
-                    ]
+                    }
                 }
             }
         }
