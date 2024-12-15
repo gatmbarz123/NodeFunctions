@@ -1,23 +1,20 @@
-pipeline{
-    
-    agent any
-    
-    stages{
-        stage("Checkout"){
-            steps{
-                git branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
-            } 
-        }
-            
+def cuildConfig =  readYaml file: 'build-config.yaml'
 
-        
-        stage("list all files "){
+pipeline{
+    agent any
+
+    stages{
+        stage('Build for test '){
             steps{
-                sh 'git ls-tree -r HEAD --name-only'
+                script{
+                    buildConfig.steps.each [steps ->
+                        stage(step.name){
+                            sh step.command 
+                        }
+                    ]
+                }
             }
         }
-            
-
     }
 
 }

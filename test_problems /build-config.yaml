@@ -1,0 +1,9 @@
+steps:
+  - name: username
+    command: echo $(whoami)
+  
+  - name: list all git files 
+    command: git ls-tree -r HEAD --name-only
+
+  - name: Work? 
+    command: echo "it work"
