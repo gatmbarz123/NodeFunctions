@@ -9,7 +9,7 @@ pipeline {
         }
 
         stage("Read and Print"){
-            step{
+            steps{
                 script{
                     def Readfile = readFile file: "data.json"
                     def jsonFile = readJSON file: Readfile
