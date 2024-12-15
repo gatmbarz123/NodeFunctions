@@ -13,8 +13,8 @@ pipeline {
                 script{
                     def jsonData = readJSON file: 'data.json'
 
-                    jsonFile.each{ key,value ->
-                        echo $"{key}" ':' $"{value}"
+                    jsonData.each{ key,value ->
+                        echo "${key} : ${value}"
 
                     }
                 }
