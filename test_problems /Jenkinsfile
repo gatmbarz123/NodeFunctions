@@ -7,6 +7,7 @@ pipeline{
                 git branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
             }
         }
+    }
 
     stages{
         stage("Read File"){
@@ -30,4 +31,3 @@ pipeline{
         }
     }
 
-}
