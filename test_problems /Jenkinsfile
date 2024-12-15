@@ -12,7 +12,10 @@ pipeline{
     
         stage("Read File"){
             steps{
-                buildConfig =  readYaml file: 'build-config.yaml'
+                script{
+                    buildConfig =  readYaml file: 'build-config.yaml'
+                }
+                
             }
         }
     
