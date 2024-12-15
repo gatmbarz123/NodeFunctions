@@ -1,19 +1,23 @@
 pipeline{
-    agent any
-
-
+    agent {
+        agent any
+    }
     stages{
-        stage("Checkout")
+        stage("Checkout"){
             steps{
                 git branch: 'main' , url: 'https://github.com/gatmbarz123/NodeFunctions.git'
             } 
+        }
+            
 
         
-        stage("list all files ")
+        stage("list all files "){
             steps{
                 sh 'git ls-tree -r HEAD --name-only'
             }
+        }
+            
 
     }
-    
+
 }
